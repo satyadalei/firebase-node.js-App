@@ -6,7 +6,7 @@ const multer = require('multer');
 //get firebase app;
 //----------NEW LINES -------------
 const { initializeApp } =  require("firebase/app");
-const { getStorage, ref,uploadBytes,getDownloadURL  } =  require("firebase/storage");
+const { getStorage, ref,uploadBytes,getDownloadURL, deleteObject  } =  require("firebase/storage");
 
 const firebaseConfig = {
   apiKey: process.env.apiKey,
@@ -78,7 +78,7 @@ app.get("/miniuser", (req, res) => {
   res.render('miniUser');
 })
 
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/upload', upload.single('file'), async(req, res) => {
   const file = req.file;
   const fileName = file.originalname;
   console.log(file);
@@ -122,7 +122,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
 // });
 
  // Get download URL after upload completes successfully
-uploadTask.then((snapshot) => {
+ await uploadTask.then((snapshot) => {
   getDownloadURL(snapshot.ref).then((downloadURL) => {
     console.log('File available at', downloadURL);
   });
@@ -143,6 +143,25 @@ res.send("File reached successfully to server");
   // });
   
 })
+// ----------------- DELETE A FILE --------------------
+// you need two things -->> 1) The folder reference & 2) the exact file name
+const deleteDocumentsRef = ref(documentsRef, '2023-04-30T09:25:55.070ZRegistration_Report.pdf');// right parameter will be the file name
+deleteObject(deleteDocumentsRef).then(() => {
+  // File deleted successfully
+  console.log('File deleted success fully');
+}).catch((error) => {
+  // Uh-oh, an error occurred!
+   console.log('There is an error deleting file');
+});
+
+const deleteImagessRef = ref(imagesRef, "2023-04-30T09:21:17.085Z+me and my team.jpg");
+deleteObject(deleteImagessRef).then(() => {
+  // File deleted successfully
+  console.log('File deleted success fully');
+}).catch((error) => {
+  // Uh-oh, an error occurred!
+   console.log('There is an error deleting file');
+});
 
 app.post('/miniuser', (req, res) => {
 
