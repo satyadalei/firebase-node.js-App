@@ -5,6 +5,11 @@ const multer = require('multer');
 //get firebase app;
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebase/digitallibrary-ad854-firebase-adminsdk-hd9cn-b59f1f5e91.json');
+const { Storage } = require('@google-cloud/storage');
+const storage = new Storage({
+  projectId: 'digitallibrary-ad854',
+  keyFilename: './firebase/digitallibrary-ad854-firebase-adminsdk-hd9cn-b59f1f5e91.json'
+});
 const path = require('path');
 const fs = require("fs");
 const mongoose = require("mongoose");
@@ -25,13 +30,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", 'ejs');
 const upload = multer({
   limits: {
-    fileSize: 1024 * 1024 // 1 MB file size limit
+    fileSize: 1024 * 1024 *10 // 10 MB file size limit
   },
   fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith('image/')) {
+    // here i can get pdf or images
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('application/pdf') ) {
       cb(null, true);
     } else {
-      cb(new Error('Only images are allowed.'));
+      cb(new Error('Only images or pdfs are allowed.'));
     }
   },
   storage: multer.memoryStorage() // store file in memory as buffer
@@ -56,21 +62,30 @@ app.post('/upload', upload.single('file'), (req, res) => {
     return res.status(400).send('No image file found.');
   }
 
-  const blob = bucket.file(req.file.originalname);
-  const blobStream = blob.createWriteStream();
+  // something is stoping below
+  //const bucket = storage.bucket('gs://digitallibrary-ad854.appspot.com/');
+  const folderPath = `images/`;
+  const fileUpload = bucket.file(`${folderPath}`);
+  const stream = fileUpload.createWriteStream({
+    metadata: {
+      contentType: file.mimetype,
+    }
+  })
 
-  blobStream.on('error', err => {
-    next(err);
+
+  /// something is stoping here above
+  stream.on('error', (error) => {
+    console.error(error);
+    res.status(500).send('Unable to upload image.');
   });
-
-  blobStream.on('finish', () => {
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-    res.status(200).send(publicUrl);
+  stream.on('finish', async () => {
+    const url = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
+    // Save the file URL to your database
+    // ...
+    console.log("Image url is : " + url);
+    res.send('File uploaded successfully!');
   });
-
-  blobStream.end(req.file.buffer);
-
-  // res.send('File uploaded');
+  
 })
 
 app.post('/miniuser', (req, res) => {
