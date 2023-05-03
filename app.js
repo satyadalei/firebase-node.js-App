@@ -29,8 +29,8 @@ const firebaseConfig = {
 // const path = require('path');
 // const fs = require("fs");
 // const mongoose = require("mongoose");
-const imageModel = require('./models/imageModel');
-const miniUserModel = require('./models/miniUsersModel');
+// const imageModel = require('./models/imageModel');
+// const miniUserModel = require('./models/miniUsersModel');
 //connect to mongoDB
 const connect = require("./db");
 
@@ -145,23 +145,23 @@ res.send("File reached successfully to server");
 })
 // ----------------- DELETE A FILE --------------------
 // you need two things -->> 1) The folder reference & 2) the exact file name
-const deleteDocumentsRef = ref(documentsRef, '2023-04-30T09:25:55.070ZRegistration_Report.pdf');// right parameter will be the file name
-deleteObject(deleteDocumentsRef).then(() => {
-  // File deleted successfully
-  console.log('File deleted success fully');
-}).catch((error) => {
-  // Uh-oh, an error occurred!
-   console.log('There is an error deleting file');
-});
+// const deleteDocumentsRef = ref(documentsRef, '2023-04-30T09:25:55.070ZRegistration_Report.pdf');// right parameter will be the file name
+// deleteObject(deleteDocumentsRef).then(() => {
+//   // File deleted successfully
+//   console.log('File deleted success fully');
+// }).catch((error) => {
+//   // Uh-oh, an error occurred!
+//    console.log('There is an error deleting file');
+// });
 
-const deleteImagessRef = ref(imagesRef, "2023-04-30T09:21:17.085Z+me and my team.jpg");
-deleteObject(deleteImagessRef).then(() => {
-  // File deleted successfully
-  console.log('File deleted success fully');
-}).catch((error) => {
-  // Uh-oh, an error occurred!
-   console.log('There is an error deleting file');
-});
+// const deleteImagessRef = ref(imagesRef, "2023-04-30T09:21:17.085Z+me and my team.jpg");
+// deleteObject(deleteImagessRef).then(() => {
+//   // File deleted successfully
+//   console.log('File deleted success fully');
+// }).catch((error) => {
+//   // Uh-oh, an error occurred!
+//    console.log('There is an error deleting file');
+// });
 
 app.post('/miniuser', (req, res) => {
 
